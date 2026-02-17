@@ -1,0 +1,38 @@
+EE 5271 Assignment 1: HOG Feature and Face Detection
+
+Overview
+This writeup summarizes my implementation of a Histogram of Oriented Gradients (HOG)
+feature extractor and a simple face detection pipeline using normalized cross-correlation
+(NCC) on HOG descriptors. The implementation follows the assignment specification and
+visualizes both HOG features and face detections.
+
+HOG Feature Extraction
+1) Preprocessing: The input grayscale image is converted to float and normalized to [0, 1].
+2) Gradients: x and y image derivatives are computed using 3x3 differential filters
+   (Sobel-style). Gradient magnitude and unsigned orientation are computed, with angles
+   in [0, pi).
+3) Orientation Binning: The image is divided into non-overlapping cells of size 8x8.
+   For each cell, a 6-bin histogram is built using the angle ranges defined in the PDF
+   (bin centers every 30 degrees with 15-degree boundaries and wrap-around).
+4) Block Normalization: 2x2 cell blocks are concatenated (24 values per block) and
+   L2-normalized with epsilon = 0.001 to improve illumination/contrast invariance.
+5) Descriptor: All normalized block descriptors are concatenated to form the final HOG
+   feature vector.
+
+[Insert HOG Visualization Figure Here]
+
+Face Detection
+1) Template HOG: Compute the HOG descriptor for the 50x50 template and zero-mean it.
+2) Sliding Window: For each possible 50x50 patch in the target image, compute HOG,
+   zero-mean it, and compute the NCC score with the template descriptor.
+3) Thresholding: Retain detections with NCC >= 0.5.
+4) Non-Maximum Suppression: Apply NMS with IoU threshold 0.5 to remove overlapping
+   detections and keep the strongest boxes.
+
+[Insert Response Map / Thresholding Visualization Here]
+[Insert Final Face Detection with Bounding Boxes Here]
+
+Notes
+- Cell size: 8, block size: 2, number of bins: 6.
+- Unsigned gradients are used (theta == theta + pi).
+- Final visualization shows detections after NMS.
